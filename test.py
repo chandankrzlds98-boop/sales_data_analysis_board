@@ -245,5 +245,23 @@ if uploaded_file:
             "</div>",
             unsafe_allow_html=True
         )
+        st.markdown("### 📊 Plot Interpretation")
+
+        if mean1 > mean2:
+            st.write(f"""
+        The bar chart shows that **{group1}** has a higher average **{numeric_col}**
+        compared to **{group2}**.
+
+        This suggests that the grouping variable **{group_col}** may influence
+        the values of **{numeric_col}**.
+        """)
+        else:
+            st.write(f"""
+        The bar chart shows that **{group2}** has a higher average **{numeric_col}**
+        compared to **{group1}**.
+
+        This suggests that the grouping variable **{group_col}** may influence
+        the values of **{numeric_col}**.
+        """)
 else:
     st.info("👆 Please upload a CSV or XLSX file to begin.")

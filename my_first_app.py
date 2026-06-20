@@ -245,5 +245,288 @@ if uploaded_file:
             "</div>",
             unsafe_allow_html=True
         )
+
+        # --- Auto Visualization Section ---
+        st.subheader("📊 Automatic Visualizations with Insights")
+
+        if len(numeric_cols) > 0 or len(categorical_cols) > 0:
+
+            # --- Select Columns ---
+            col1, col2 = st.columns(2)
+
+            with col1:
+                selected_cat = st.selectbox("Select Categorical Column", ["None"] + categorical_cols)
+
+            with col2:
+                selected_num = st.selectbox("Select Numerical Column", ["None"] + numeric_cols)
+
+            # ================================
+            # 📌 1. BAR CHART
+            # ================================
+            if selected_cat != "None":
+                st.markdown("### 📊 Bar Chart")
+
+                count_data = df[selected_cat].value_counts().head(10)
+
+                fig, ax = plt.subplots()
+                sns.barplot(x=count_data.values, y=count_data.index, ax=ax)
+                ax.set_title(f"Top Categories in {selected_cat}")
+                st.pyplot(fig)
+
+                # Insight
+                st.info(f"""
+                📌 Insight:
+                - Most frequent category: **{count_data.index[0]}**
+                - Least frequent (top 10): **{count_data.index[-1]}**
+                - This chart shows distribution of {selected_cat}
+                """)
+
+            # ================================
+            # 📌 2. PIE CHART
+            # ================================
+            if selected_cat != "None":
+                st.markdown("### 🥧 Pie Chart")
+
+                pie_data = df[selected_cat].value_counts().head(5)
+
+                fig, ax = plt.subplots()
+                ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%')
+                ax.set_title(f"{selected_cat} Distribution")
+                st.pyplot(fig)
+
+                st.info(f"""
+                📌 Insight:
+                - Major share: **{pie_data.index[0]}**
+                - Shows proportion of categories in {selected_cat}
+                """)
+
+            # ================================
+            # 📌 3. HISTOGRAM
+            # ================================
+            if selected_num != "None":
+                st.markdown("### 📈 Histogram")
+
+                fig, ax = plt.subplots()
+                sns.histplot(df[selected_num], kde=True, ax=ax)
+                ax.set_title(f"Distribution of {selected_num}")
+                st.pyplot(fig)
+
+                st.info(f"""
+                📌 Insight:
+                - Mean: **{df[selected_num].mean():.2f}**
+                - Data spread shows distribution pattern
+                """)
+
+            # ================================
+            # 📌 4. LINE CHART
+            # ================================
+            if selected_num != "None":
+                st.markdown("### 📉 Line Chart")
+
+                fig, ax = plt.subplots()
+                df[selected_num].plot(ax=ax)
+                ax.set_title(f"Trend of {selected_num}")
+                st.pyplot(fig)
+
+                st.info(f"""
+                📌 Insight:
+                - Shows trend of {selected_num} over index
+                - Useful for time-series patterns
+                """)
+
+            # ================================
+            # 📌 5. BOX PLOT
+            # ================================
+            if selected_num != "None":
+                st.markdown("### 📦 Box Plot")
+
+                fig, ax = plt.subplots()
+                sns.boxplot(x=df[selected_num], ax=ax)
+                ax.set_title(f"Boxplot of {selected_num}")
+                st.pyplot(fig)
+
+                st.info(f"""
+                📌 Insight:
+                - Median: **{df[selected_num].median():.2f}**
+                - Detects outliers and spread
+                """)
+
+            # ================================
+            # 📌 6. SCATTER PLOT
+            # ================================
+            if len(numeric_cols) >= 2:
+                st.markdown("### 🔵 Scatter Plot")
+
+                x_col = st.selectbox("X-axis", numeric_cols, key="scatter_x")
+                y_col = st.selectbox("Y-axis", numeric_cols, key="scatter_y")
+
+                fig, ax = plt.subplots()
+                sns.scatterplot(data=df, x=x_col, y=y_col, ax=ax)
+                ax.set_title(f"{x_col} vs {y_col}")
+                st.pyplot(fig)
+
+                corr = df[[x_col, y_col]].corr().iloc[0, 1]
+
+                st.info(f"""
+                📌 Insight:
+                - Correlation: **{corr:.2f}**
+                - {'Positive relationship' if corr > 0 else 'Negative relationship' if corr < 0 else 'No strong relationship'}
+                """)
 else:
     st.info("👆 Please upload a CSV or XLSX file to begin.")
+# ==================================
+# 🤖 Data Chat Assistant
+# ==================================
+
+# st.divider()
+# st.subheader("🤖 Ask Questions About Your Data")
+#
+# user_question = st.chat_input("Ask something about the uploaded dataset...")
+#
+# if user_question:
+#
+#     question = user_question.lower()
+#
+#     # Show user message
+#     with st.chat_message("user"):
+#         st.write(user_question)
+
+    # # Bot response
+    # with st.chat_message("assistant"):
+    #
+    #     if "rows" in question:
+    #         st.write(f"The dataset contains **{df.shape[0]} rows**.")
+    #
+    #     elif "columns" in question:
+    #         st.write(f"The dataset contains **{df.shape[1]} columns**.")
+    #
+    #     elif "missing" in question:
+    #         missing = df.isnull().sum().sum()
+    #         st.write(f"There are **{missing} missing values** in the dataset.")
+    #
+    #     elif "numeric" in question:
+    #         st.write("Numeric columns:")
+    #         st.write(numeric_cols)
+    #
+    #     elif "categorical" in question:
+    #         st.write("Categorical columns:")
+    #         st.write(categorical_cols)
+    #
+    #     elif "summary" in question:
+    #         st.dataframe(df.describe())
+    #
+    #     else:
+    #         st.write(
+    #             """
+    #             I can answer:
+    #             - Number of rows
+    #             - Number of columns
+    #             - Missing values
+    #             - Numeric columns
+    #             - Categorical columns
+    #             - Summary statistics
+    #             """
+    #         )
+# Gemini Configuration
+# Access Gemini API key from Streamlit secrets
+GEMINI_API_KEY = st.secrets["gemini"]["api_key"]
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+model = genai.GenerativeModel("gemini-2.5-flash")
+
+
+# ==================================
+# 🤖 Gemini AI Assistant
+# ==================================
+
+st.divider()
+st.subheader("🤖 Gemini Data Assistant")
+
+if uploaded_file:
+
+    user_question = st.chat_input(
+        "Ask anything about your uploaded dataset..."
+    )
+
+    if user_question:
+
+        with st.chat_message("user"):
+            st.write(user_question)
+
+        # Dataset Context
+        data_context = f"""
+        Dataset Information:
+
+        Shape: {df.shape}
+
+        Columns:
+        {list(df.columns)}
+
+        First 10 Rows:
+        {df.head(10).to_string()}
+
+        Summary Statistics:
+        {df.describe(include='all').to_string()}
+        """
+
+        prompt = f"""
+        You are a Data Analyst.
+
+        Dataset Context:
+        {data_context}
+
+        User Question:
+        {user_question}
+
+        Give clear insights and explanations.
+        """
+
+        try:
+            response = model.generate_content(prompt)
+
+            with st.chat_message("assistant"):
+                st.write(response.text)
+
+        except Exception as e:
+            st.error(f"Error: {e}")
+
+            if "messages" not in st.session_state:
+                st.session_state.messages = []
+
+            for msg in st.session_state.messages:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
+
+            prompt = st.chat_input("Ask about your dataset...")
+
+            if prompt:
+                st.session_state.messages.append(
+                    {"role": "user", "content": prompt}
+                )
+
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+
+                dataset_context = f"""
+                Dataset Shape: {df.shape}
+
+                Columns:
+                {list(df.columns)}
+
+                Sample Data:
+                {df.head(20).to_string()}
+                """
+
+                response = model.generate_content(
+                    dataset_context + "\n\nQuestion: " + prompt
+                )
+
+                answer = response.text
+
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": answer}
+                )
+
+                with st.chat_message("assistant"):
+                    st.markdown(answer)

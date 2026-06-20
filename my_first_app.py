@@ -430,7 +430,8 @@ else:
     #             """
     #         )
 # Gemini Configuration
-GEMINI_API_KEY = {gemini_key}
+# Access Gemini API key from Streamlit secrets
+GEMINI_API_KEY = st.secrets["gemini"]["api_key"]
 
 genai.configure(api_key=GEMINI_API_KEY)
 

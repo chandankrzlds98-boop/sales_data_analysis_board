@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 import google.generativeai as genai
-# anil and chandan
-
+# Anil and Chandan work in progress
 # --- Streamlit Page Setup ---
 st.set_page_config(
     page_title="📊 Generic Data Analysis Dashboard",
@@ -443,7 +442,7 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 # ==================================
 
 st.divider()
-st.subheader("🤖 Gemini Data Assistant")
+st.subheader("🤖 My Data Assistant")
 
 if uploaded_file:
 

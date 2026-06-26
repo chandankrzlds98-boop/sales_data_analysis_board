@@ -442,7 +442,7 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 # ==================================
 
 st.divider()
-st.subheader("🤖 Gemini Data Assistant")
+st.subheader("🤖 My Data Assistant")
 
 if uploaded_file:
 
